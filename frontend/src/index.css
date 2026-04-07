@@ -1,0 +1,86 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary-light: #2a4d69;
+  --color-primary: #1a3a5a;
+  --color-primary-dark: #0e1a2b;
+  
+  --color-secondary-light: #ffb347;
+  --color-secondary: #f97316;
+  --color-secondary-dark: #c2410c;
+  
+  --color-dark-light: #374151;
+  --color-dark: #111827;
+  --color-dark-dark: #030712;
+  
+  --background-image-hero-pattern: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://images.unsplash.com/photo-1520340356584-f9917d1eea6f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');
+}
+
+@layer base {
+  :root {
+    font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+    font-weight: 400;
+
+    color-scheme: light dark;
+    color: rgba(255, 255, 255, 0.87);
+    background-color: #0f172a;
+
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    margin: 0;
+    display: flex;
+    place-items: center;
+    min-width: 320px;
+    min-height: 100vh;
+    background-color: #0f172a;
+  }
+
+  #root {
+    width: 100%;
+  }
+}
+
+@layer components {
+  .glass-morphism {
+    background: rgba(26, 58, 90, 0.2);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .btn-primary {
+    @apply bg-secondary hover:bg-secondary-dark text-white font-bold py-2 px-6 rounded-full transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-lg;
+  }
+
+  .btn-outline {
+    @apply border-2 border-secondary text-secondary hover:bg-secondary hover:text-white font-bold py-2 px-6 rounded-full transition-all duration-300 transform hover:scale-105 active:scale-95;
+  }
+
+  input, select, textarea {
+    @apply bg-primary-dark border border-slate-700 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-secondary transition-all;
+  }
+
+  .card {
+    @apply bg-primary-dark rounded-xl overflow-hidden shadow-2xl border border-slate-800 transition-all duration-300 hover:border-secondary hover:-translate-y-2;
+  }
+}
+
+@layer utilities {
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-primary-dark;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-slate-700 rounded-full hover:bg-secondary;
+  }
+}

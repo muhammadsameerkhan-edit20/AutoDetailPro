@@ -41,10 +41,10 @@ const Dashboard = () => {
 
   const fetchUserData = async () => {
     try {
-      const [bookRes, vehRes] = await Promise.all([
-        api.get('/bookings'),
-        api.get('/vehicles')
-      ]);
+        const [bookRes, vehRes] = await Promise.all([
+          api.get('/history'),
+          api.get('/vehicles')
+        ]);
       setBookings(bookRes.data.data);
       setVehicles(vehRes.data.data);
     } catch (err) {
@@ -191,17 +191,36 @@ const Dashboard = () => {
                 {uploadingImage ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> : <Camera size={16} />}
              </button>
           </div>
-          <div>
+          <div className="flex-1">
              <h1 className="text-4xl font-black text-white uppercase tracking-tighter">{user?.name}</h1>
              <p className="text-gray-400 font-medium">{user?.email}</p>
-             <div className="mt-4 flex gap-3">
-                <span className="px-3 py-1 bg-secondary/20 text-secondary border border-secondary/30 rounded-full text-xs font-bold uppercase tracking-widest">
-                  Premium Member
+             <div className="mt-4 flex flex-wrap gap-3">
+                <span className={`px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest border ${
+                   user?.loyaltyTier === 'Diamond' ? 'bg-blue-500/20 text-blue-400 border-blue-500/30' :
+                   user?.loyaltyTier === 'Gold' ? 'bg-yellow-500/20 text-yellow-500 border-yellow-500/30' :
+                   'bg-secondary/20 text-secondary border-secondary/30'
+                }`}>
+                  {user?.loyaltyTier || 'Classic'} TIER
+                </span>
+                <span className="px-3 py-1 bg-slate-800 text-gray-400 border border-slate-700 rounded-full text-xs font-bold uppercase">
+                  {user?.loyaltyPoints || 0} POINTS EARNED
                 </span>
                 <span className="px-3 py-1 bg-slate-800 text-gray-400 border border-slate-700 rounded-full text-xs font-bold uppercase">
                   Joined {user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}
                 </span>
              </div>
+          </div>
+          
+          {/* Points Progress Visual */}
+          <div className="hidden lg:block w-64 bg-primary p-6 rounded-2xl border border-slate-800 text-center">
+             <p className="text-[10px] font-black text-gray-600 uppercase tracking-widest mb-2">Next Tier Progress</p>
+             <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden mb-2">
+                <div 
+                  className="bg-secondary h-full transition-all duration-1000" 
+                  style={{ width: `${Math.min((user?.loyaltyPoints || 0) / (user?.loyaltyTier === 'Classic' ? 5 : user?.loyaltyTier === 'Gold' ? 20 : 100), 100)}%` }}
+                ></div>
+             </div>
+             <p className="text-[10px] font-bold text-gray-400">{user?.loyaltyPoints || 0} / {user?.loyaltyTier === 'Classic' ? '500' : user?.loyaltyTier === 'Gold' ? '2000' : 'MAX'} PTS</p>
           </div>
         </div>
       </div>

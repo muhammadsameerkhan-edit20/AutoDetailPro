@@ -38,29 +38,27 @@ exports.createBooking = async (req, res) => {
             totalAmount: service.price
         });
 
+        // Loyalty Points Calculation (10 points per Rs. 1000 spent)
+        const earnedPoints = Math.floor(service.price / 100);
+        
+        // Update user loyalty points and tier
+        const userObj = await User.findById(req.user.id);
+        userObj.loyaltyPoints += earnedPoints;
+
+        // Auto-tier upgrade logic
+        if (userObj.loyaltyPoints >= 2000) userObj.loyaltyTier = 'Diamond';
+        else if (userObj.loyaltyPoints >= 500) userObj.loyaltyTier = 'Gold';
+        
+        await userObj.save();
+
         // Send email notification
-        const userCount = await User.findById(req.user.id);
         sendEmail({
-            email: userCount.email,
+            email: userObj.email,
             subject: 'AutoDetail Pro - Booking Received (Pending)',
-            message: `Hello ${userCount.name},\n\nYour appointment request for ${service.name} has been received and is currently pending administrator approval.\n\nRequested Date: ${bookingDate}\nRequested Time: ${timeSlot}\nTotal Amount: $${service.price}\n\nWe will notify you once it has been accepted!\n\nThank you for choosing AutoDetail Pro!`
+            message: `Hello ${userObj.name},\n\nYour appointment request for ${service.name} has been received and is currently pending administrator approval.\n\nRequested Date: ${bookingDate}\nRequested Time: ${timeSlot}\nTotal Amount: Rs. ${service.price}\n\nYou've also earned ${earnedPoints} Loyalty Points!\n\nWe will notify you once it has been accepted!\n\nThank you for choosing AutoDetail Pro!`
         });
 
         res.status(201).json({ success: true, data: booking });
-    } catch (err) {
-        res.status(400).json({ success: false, message: err.message });
-    }
-};
-
-// @desc    Get user's booking history
-// @route   GET /api/bookings
-// @access  Private
-exports.getBookings = async (req, res) => {
-    try {
-        const bookings = await Booking.find({ user: req.user.id })
-            .populate('vehicle')
-            .populate('service');
-        res.status(200).json({ success: true, count: bookings.length, data: bookings });
     } catch (err) {
         res.status(400).json({ success: false, message: err.message });
     }

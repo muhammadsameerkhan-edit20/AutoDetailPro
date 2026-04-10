@@ -37,13 +37,22 @@ const userSchema = new mongoose.Schema({
     createdAt: {
         type: Date,
         default: Date.now
+    },
+    loyaltyPoints: {
+        type: Number,
+        default: 0
+    },
+    loyaltyTier: {
+        type: String,
+        enum: ['Classic', 'Gold', 'Diamond'],
+        default: 'Classic'
     }
 });
 
 // Encrypt password using bcrypt
-userSchema.pre('save', async function(next) {
+userSchema.pre('save', async function() {
     if (!this.isModified('password')) {
-        next();
+        return;
     }
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);

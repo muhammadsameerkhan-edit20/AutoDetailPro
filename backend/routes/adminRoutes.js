@@ -1,5 +1,5 @@
 const express = require('express');
-const { getDashboardStats, getAllBookings, getAllUsers, bulkTrashBookings } = require('../controllers/adminController');
+const { getAllBookings, getAllUsers, bulkTrashBookings } = require('../controllers/adminController');
 const { updateBookingStatus } = require('../controllers/bookingController');
 const { protect } = require('../middleware/authMiddleware');
 const { authorize } = require('../middleware/roleMiddleware');
@@ -10,7 +10,6 @@ const router = express.Router();
 router.use(protect);
 router.use(authorize('admin'));
 
-router.get('/dashboard', getDashboardStats);
 router.get('/bookings', getAllBookings);
 router.put('/bookings/bulk-trash', bulkTrashBookings);
 router.put('/bookings/:id/status', updateBookingStatus);

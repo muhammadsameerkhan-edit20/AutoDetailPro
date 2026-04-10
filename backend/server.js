@@ -38,6 +38,11 @@ const payments = require('./routes/paymentRoutes');
 const admin = require('./routes/adminRoutes');
 const chatbot = require('./routes/chatbotRoutes');
 const uploadRoutes = require('./routes/uploadRoutes');
+const history = require('./routes/historyRoutes');
+const notifications = require('./routes/notificationRoutes');
+const analytics = require('./routes/analyticsRoutes');
+const rbac = require('./routes/rbacRoutes');
+const offers = require('./routes/offerRoutes');
 
 const errorHandler = require('./middleware/errorMiddleware');
 
@@ -59,6 +64,11 @@ app.use('/api/payments', payments);
 app.use('/api/admin', admin);
 app.use('/api/chatbot', chatbot);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/history', history);
+app.use('/api/notifications', notifications);
+app.use('/api/analytics', analytics);
+app.use('/api/rbac', rbac);
+app.use('/api/offers', offers);
 
 // Error handler middleware
 app.use(errorHandler);

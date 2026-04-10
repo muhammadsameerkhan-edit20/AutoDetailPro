@@ -17,12 +17,8 @@ const Login = () => {
     setError('');
     setIsSubmitting(true);
     try {
-      const user = await login(email, password);
-      if (user.role === 'admin') {
-         navigate('/admin');
-      } else {
-         navigate('/dashboard');
-      }
+      await login(email, password);
+      navigate('/');
     } catch (err) {
       setError(err.response?.data?.message || 'Invalid credentials. Please try again.');
     } finally {

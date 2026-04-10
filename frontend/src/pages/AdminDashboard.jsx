@@ -8,10 +8,10 @@ import {
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState({
-    totalBookings: 0,
-    totalUsers: 0,
     totalRevenue: 0,
-    monthlyRevenue: 0
+    monthlyRevenue: 0,
+    prevMonthRevenue: 0,
+    lastResetDate: null
   });
   const [bookings, setBookings] = useState([]);
   const [services, setServices] = useState([]);
@@ -42,10 +42,10 @@ const AdminDashboard = () => {
     try {
       setLoading(true);
       const [statsRes, bookRes, servRes, userRes] = await Promise.all([
-        api.get('/admin/dashboard'),
+        api.get('/analytics/dashboard'),
         api.get('/admin/bookings'),
         api.get('/services'),
-        api.get('/admin/users')
+        api.get('/rbac/users')
       ]);
       setStats(statsRes.data.data);
       setBookings(bookRes.data.data);
@@ -187,11 +187,23 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleResetRevenue = async () => {
+    if (window.confirm('WARNING: This will reset the "Monthly Revenue" counter to zero starting from today. Are you sure?')) {
+      try {
+        await api.post('/analytics/reset-monthly');
+        alert('Revenue counter reset successfully!');
+        fetchAdminData();
+      } catch (err) {
+        alert('Error resetting revenue');
+      }
+    }
+  };
+
   const statCards = [
-    { label: 'Total Revenue', value: `Rs. ${stats.totalRevenue.toLocaleString()}`, icon: <DollarSign className="text-green-500" />, trend: '+12.5%' },
-    { label: 'Active Bookings', value: stats.totalBookings, icon: <Calendar className="text-blue-500" />, trend: '+5.4%' },
-    { label: 'Total Customers', value: stats.totalUsers, icon: <Users className="text-purple-500" />, trend: '+18.2%' },
-    { label: 'Monthly Growth', value: `Rs. ${stats.monthlyRevenue.toLocaleString()}`, icon: <TrendingUp className="text-secondary" />, trend: '+22.1%' }
+    { label: 'Total Revenue', value: `Rs. ${stats.totalRevenue.toLocaleString()}`, icon: <DollarSign className="text-green-500" />, trend: 'Lifetime' },
+    { label: 'Active Bookings', value: stats.totalBookings, icon: <Calendar className="text-blue-500" />, trend: 'Active' },
+    { label: 'Monthly Revenue', value: `Rs. ${stats.monthlyRevenue.toLocaleString()}`, icon: <TrendingUp className="text-secondary" />, trend: `Reset: ${stats.lastResetDate ? new Date(stats.lastResetDate).toLocaleDateString() : 'Never'}` },
+    { label: 'Last Month', value: `Rs. ${stats.prevMonthRevenue.toLocaleString()}`, icon: <Clock className="text-purple-400" />, trend: 'Archived' }
   ];
 
   if (loading) return (
@@ -207,8 +219,18 @@ const AdminDashboard = () => {
     <div className="min-h-screen bg-dark pb-20">
       <div className="bg-primary-dark pt-32 pb-8 px-4 border-b border-slate-800">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-4xl font-black text-white uppercase tracking-tighter mb-2">ADMIN CENTRAL</h1>
-          <p className="text-gray-400 font-bold text-xs uppercase tracking-widest">Global Control Surface</p>
+          <div className="flex justify-between items-end">
+            <div>
+              <h1 className="text-4xl font-black text-white uppercase tracking-tighter mb-2">ADMIN CENTRAL</h1>
+              <p className="text-gray-400 font-bold text-xs uppercase tracking-widest">Global Control Surface</p>
+            </div>
+            <button 
+              onClick={handleResetRevenue}
+              className="bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white px-4 py-2 rounded-xl border border-red-500/20 text-[10px] font-black uppercase tracking-widest transition-all mb-2"
+            >
+              Reset Period
+            </button>
+          </div>
         </div>
       </div>
 
